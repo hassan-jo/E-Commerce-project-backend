@@ -1,6 +1,8 @@
 require("dotenv").config();
 
 const express = require("express");
+const path = require("path");
+
 const connectDB = require("./config/db");
 
 const swaggerUi = require("swagger-ui-express");
@@ -33,14 +35,14 @@ app.use(cors({
 }));
 
 /* ================================
-   Security Middleware (Simple Version)
+   Security Middleware
 ================================ */
 
 app.use(helmet());
 app.use(xss());
 
 /* ================================
-   Swagger Docs
+   Swagger Configuration (Fixed)
 ================================ */
 
 const swaggerOptions = {
@@ -48,10 +50,11 @@ const swaggerOptions = {
     openapi: "3.0.0",
     info: {
       title: "Ecommerce API",
-      version: "1.0.0"
+      version: "1.0.0",
+      description: "Ecommerce Backend API Documentation"
     }
   },
-  apis: ["./routes/*.js"]
+  apis: [path.join(__dirname, "routes/*.js")]
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -77,7 +80,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 
 /* ================================
-   Error Handler (Always Last)
+   Error Handler
 ================================ */
 
 app.use(errorHandler);
