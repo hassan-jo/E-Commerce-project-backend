@@ -1,8 +1,6 @@
 require("dotenv").config();
 
 const express = require("express");
-const path = require("path");
-
 const connectDB = require("./config/db");
 
 const swaggerUi = require("swagger-ui-express");
@@ -21,9 +19,9 @@ const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
-/* ========================================
+/* ===============================
    Core Middleware
-======================================== */
+================================ */
 
 app.use(express.json());
 
@@ -32,7 +30,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://e-commerce-project-backend-ib6m.onrender.com"
+      "https://e-commerce-project-frontend.com"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -40,16 +38,22 @@ app.use(
   })
 );
 
-/* ========================================
-   Security Layer
-======================================== */
+/* ===============================
+   Security Middleware
+================================ */
 
 app.use(helmet());
 app.use(xss());
 
-/* ========================================
-   Swagger Configuration (Professional Level)
-======================================== */
+/* ===============================
+   Database Connection
+================================ */
+
+connectDB();
+
+/* ===============================
+   Swagger Documentation
+================================ */
 
 const swaggerOptions = {
   definition: {
@@ -58,21 +62,17 @@ const swaggerOptions = {
     info: {
       title: "E-Commerce SaaS Backend API",
       version: "1.0.0",
-      description: `
-Professional Backend Architecture
-
-Features Included:
-
-• JWT Authentication System  
-• Refresh Token Rotation Strategy  
-• Role Based Access Control  
-• Secure Cart Transaction Flow  
-• MongoDB Cloud Storage  
-• Pagination Engine  
-• Search & Sorting Support  
-
-This API is designed for production SaaS marketplace usage.
-      `
+      description:
+        "Professional Backend Architecture\n\n" +
+        "Features Included:\n" +
+        "• JWT Authentication System\n" +
+        "• Refresh Token Rotation Strategy\n" +
+        "• Role Based Access Control\n" +
+        "• Secure Cart Transaction Flow\n" +
+        "• MongoDB Cloud Storage\n" +
+        "• Pagination Engine\n" +
+        "• Search & Sorting Support\n\n" +
+        "This API is designed for production SaaS marketplace usage."
     },
 
     servers: [
@@ -84,7 +84,7 @@ This API is designed for production SaaS marketplace usage.
 
     components: {
       securitySchemes: {
-        bearerAuth: {
+        BearerAuth: {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT"
@@ -94,7 +94,7 @@ This API is designed for production SaaS marketplace usage.
 
     security: [
       {
-        bearerAuth: []
+        BearerAuth: []
       }
     ]
   },
@@ -106,33 +106,27 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-/* ========================================
-   Database Connection
-======================================== */
-
-connectDB();
-
-/* ========================================
-   Routes Layer
-======================================== */
+/* ===============================
+   Routes
+================================ */
 
 app.use("/api/auth", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 
-/* ========================================
-   Global Error Handler
-======================================== */
+/* ===============================
+   Error Handler
+================================ */
 
 app.use(errorHandler);
 
-/* ========================================
-   Server Bootstrap
-======================================== */
+/* ===============================
+   Server Start
+================================ */
 
-const PORT = process.env.PORT || 3002;
+const port = process.env.PORT || 3002;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
